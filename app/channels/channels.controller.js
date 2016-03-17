@@ -2,6 +2,8 @@ angular.module('angularfireSlackApp')
   .controller('ChannelsCtrl', function($state, Auth, Users, profile, channels) {
     var channelsCtrl = this;
 
+    Users.setOnline(profile.$id);
+
     channelsCtrl.profile = profile;
     channelsCtrl.channels = channels;
     channelsCtrl.users = Users.all;
@@ -9,8 +11,11 @@ angular.module('angularfireSlackApp')
     channelsCtrl.getDisplayName = Users.getDisplayName;
     channelsCtrl.getGravatar = Users.getGravatar;
     channelsCtrl.logout = function() {
-      Auth.$unauth();
-      $state.go('home');
+      channelsCtrl.profile.online = null;
+      channelsCtrl.profile.$save().then(function() {
+        Auth.$unauth();
+        $state.go('home');
+      });
     }
 
     channelsCtrl.newChannel = {
